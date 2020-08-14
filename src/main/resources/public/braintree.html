@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <script src="https://js.braintreegateway.com/web/dropin/1.23.0/js/dropin.min.js"></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
+        <script>
+            $(function(){
+                var token = null;
+                $.ajax({
+                    url:'/braintree/getToken',
+                    type:'post',
+                    success:function(data){
+                        token = data;
+                    },
+                    async:false
+                });
+
+                alert(token);
+
+                var button = document.querySelector('#submit-button');
+
+                braintree.dropin.create({
+                    authorization: token,
+                    container: '#dropin-container',
+                    payapl: {
+                        flow: 'valt',
+                        buttonStyle: {  //可以修改一点点按钮的样式，限制性很多
+                            color: 'black',
+                            shape: 'rect',
+                            size: 'medium'
+
+                        }
+                    },
+                    card: {//此项选填，干掉也没关系
+                        cardholderName: {required: true}, //必填的话，就会多生成一个持卡人姓名的输入框
+                        overrides: {
+                            fields: {
+                                number: {
+                                    placeholder: 'Card Number',
+                                },
+                                cvv: {
+                                    placeholder: 'CVV'
+                                },
+                                postalCode: {
+                                    placeholder: 'Postal Code'
+                                }
+                            },
+                        }
+                    }
+                }, function (createErr, instance) {
+                    button.addEventListener('click', function () {
+                        instance.requestPaymentMethod(function (err, payload) {
+                            // Submit payload.nonce to your server
+                            if(confirm("是否继续支付0.01USD?")){
+                                $.ajax({
+                                    url:'/braintree/pay',
+                                    type:'post',
+                                    data:'nonce='+payload.nonce,
+                                    success:function(data){
+                                        alert(data.msg);
+                                    }
+                                });
+                            }
+                        });
+                    });
+                });
+            });
+
+        </script>
+    </head>
+    <body>
+        <div id="dropin-container"></div>
+        <div id="paypal-button"></div>
+
+        <button id="submit-button">Request payment method</button>
+
+    </body>
+</html>
