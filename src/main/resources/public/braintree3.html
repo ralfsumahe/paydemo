@@ -10,6 +10,7 @@
         <script src="https://js.braintreegateway.com/web/3.64.2/js/paypal-checkout.min.js"></script>
 
         <script src="https://www.paypal.com/sdk/js?client-id=sb"></script>
+
         <script>
             $(function(){
                 var token = null;
@@ -69,19 +70,17 @@
 
                         paypalCheckoutInstance.loadPayPalSDK({
                             currency: 'USD',
-                            intent: 'capture'
+                            intent: 'capture',
+                            vault: true
                         }, function () {
                             paypal.Buttons({
                                 fundingSource: paypal.FUNDING.PAYPAL,
 
-                                createOrder: function () {
+                                createBillingAgreement: function () {
                                     return paypalCheckoutInstance.createPayment({
-                                        flow: 'checkout', // Required
-                                        amount: 10.00, // Required
-                                        currency: 'USD', // Required, must match the currency passed in with loadPayPalSDK
-
-                                        intent: 'capture', // Must match the intent passed in with loadPayPalSDK
-
+                                        flow: 'vault', // Required
+                                        // The following are optional params
+                                        billingAgreementDescription: 'Your agreement description',
                                         enableShippingAddress: true,
                                         shippingAddressEditable: false,
                                         shippingAddressOverride: {

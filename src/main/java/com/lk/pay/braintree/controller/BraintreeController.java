@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/braintree")
@@ -23,6 +24,19 @@ public class BraintreeController {
 
     @PostMapping("/pay")
     public Msg pay(String nonce) {
+
+        CustomerRequest customerRequest = new CustomerRequest()
+                .firstName("Mark1")
+                .lastName("Jones1")
+                .company("Jones1 Co.")
+                .email("mark1.jones@example.com")
+                .fax("429-555-1234")
+                .phone("624-555-1234")
+                .website("http://example2.com");
+        Result<Customer> customerResult = gateway.customer().create(customerRequest);
+        System.out.println(customerResult.getTarget().getId());
+        System.out.println(customerResult.isSuccess());
+
 
         TransactionRequest request = new TransactionRequest()
                 .amount(new BigDecimal("10.00"))
