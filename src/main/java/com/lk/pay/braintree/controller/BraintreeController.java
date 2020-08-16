@@ -48,8 +48,40 @@ public class BraintreeController {
 
         Result<Transaction> result = gateway.transaction().sale(request);
         if(result.isSuccess()){
-            gateway.transaction().submitForSettlement(result.getTarget().getId());
+            return Msg.ok(result.getTarget().getStatus().toString());
+        }else{
+            return Msg.fail(result.getMessage());
+        }
+    }
 
+    @PostMapping("/pay2")
+    public Msg pay2(String nonce) {
+        gateway.plan().all().stream().forEach(plan-> System.out.println("id:"+plan.getId()+";name:"+plan.getName()));
+
+
+        gateway.customer().all().forEach(customer-> gateway.customer().delete(customer.getId()));
+
+        CustomerRequest customerRequest = new CustomerRequest()
+                .id("myid5")
+                .firstName("Mark1")
+                .lastName("Jones1")
+                .company("Jones1 Co.")
+                .email("mark1.jones@example.com")
+                .fax("429-555-1234")
+                .phone("624-555-1234")
+                .website("http://example2.com").paymentMethodNonce(nonce);
+        Result<Customer> customerResult = gateway.customer().create(customerRequest);
+
+
+        Customer customer = gateway.customer().find(customerResult.getTarget().getId());
+        String token = customer.getDefaultPaymentMethod().getToken();
+
+
+
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest().planId("7qzm").paymentMethodToken(token);
+        Result<Subscription> result = gateway.subscription().create(subscriptionRequest);
+
+        if(result.isSuccess()){
             return Msg.ok(result.getTarget().getStatus().toString());
         }else{
             return Msg.fail(result.getMessage());
