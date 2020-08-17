@@ -1,5 +1,6 @@
 package com.lk.pay.braintree.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.braintreegateway.*;
 import com.lk.pay.Msg;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,17 +26,17 @@ public class BraintreeController {
     @PostMapping("/pay")
     public Msg pay(String nonce) {
 
-        CustomerRequest customerRequest = new CustomerRequest()
-                .firstName("Mark1")
-                .lastName("Jones1")
-                .company("Jones1 Co.")
-                .email("mark1.jones@example.com")
-                .fax("429-555-1234")
-                .phone("624-555-1234")
-                .website("http://example2.com");
-        Result<Customer> customerResult = gateway.customer().create(customerRequest);
-        System.out.println(customerResult.getTarget().getId());
-        System.out.println(customerResult.isSuccess());
+//        CustomerRequest customerRequest = new CustomerRequest()
+//                .firstName("Mark1")
+//                .lastName("Jones1")
+//                .company("Jones1 Co.")
+//                .email("mark1.jones@example.com")
+//                .fax("429-555-1234")
+//                .phone("624-555-1234")
+//                .website("http://example2.com");
+//        Result<Customer> customerResult = gateway.customer().create(customerRequest);
+//        System.out.println(customerResult.getTarget().getId());
+//        System.out.println(customerResult.isSuccess());
 
 
         TransactionRequest request = new TransactionRequest()
@@ -77,9 +78,10 @@ public class BraintreeController {
         String token = customer.getDefaultPaymentMethod().getToken();
 
 
-
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest().planId("7qzm").paymentMethodToken(token);
         Result<Subscription> result = gateway.subscription().create(subscriptionRequest);
+
+        System.out.println(JSON.toJSONString(result));
 
         if(result.isSuccess()){
             return Msg.ok(result.getTarget().getStatus().toString());
