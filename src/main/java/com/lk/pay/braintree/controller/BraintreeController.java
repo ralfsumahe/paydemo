@@ -60,10 +60,12 @@ public class BraintreeController {
         gateway.plan().all().stream().forEach(plan-> System.out.println("id:"+plan.getId()+";name:"+plan.getName()));
 
 
-        gateway.customer().all().forEach(customer-> gateway.customer().delete(customer.getId()));
+        //gateway.customer().all().forEach(customer-> gateway.customer().delete(customer.getId()));
+
+        System.out.println(nonce);
 
         CustomerRequest customerRequest = new CustomerRequest()
-                .id("myid5")
+                .id("myid11")
                 .firstName("Mark1")
                 .lastName("Jones1")
                 .company("Jones1 Co.")
@@ -72,6 +74,8 @@ public class BraintreeController {
                 .phone("624-555-1234")
                 .website("http://example2.com").paymentMethodNonce(nonce);
         Result<Customer> customerResult = gateway.customer().create(customerRequest);
+
+
 
 
         Customer customer = gateway.customer().find(customerResult.getTarget().getId());

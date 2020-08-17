@@ -10,7 +10,7 @@ public class Test2 {
 
     @Test
     public void getCustomer(){
-        System.out.println(gateway.customer().all().getFirst().getId());
+        System.out.println(gateway.customer());
     }
 
 }

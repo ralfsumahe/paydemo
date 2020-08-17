@@ -15,18 +15,18 @@ public class Test {
         System.out.println(gateway.customer().all().getIds());
 
         CustomerRequest customerRequest = new CustomerRequest()
-                .id("myid5")
-                .firstName("Mark5")
-                .lastName("Jones5")
-                .company("Jones5 Co.")
-                .email("mark5.jones@example.com")
+                .id("myid6")
+                .firstName("li")
+                .lastName("si")
+                .company("lisi Co.")
+                .email("lisi@163.com")
                 .fax("429-555-1234")
                 .phone("624-555-1234")
-                .website("http://example5.com");
+                .website("http://examplelisi.com");
         Result<Customer> customerResult = gateway.customer().create(customerRequest);
 
-        System.out.println(gateway.customer().all().getIds());
-
-        System.out.println(JSON.toJSONString(gateway.subscription().search(new SubscriptionSearchRequest().merchantAccountId().is("z3kj2246rsvttk8w"))));
+//        System.out.println(gateway.customer().all().getIds());
+//
+//        System.out.println(JSON.toJSONString(gateway.subscription().search(new SubscriptionSearchRequest().merchantAccountId().is("z3kj2246rsvttk8w"))));
     }
 }
