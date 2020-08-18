@@ -15,7 +15,7 @@
             $(function(){
                 var token = null;
                 $.ajax({
-                    url:'/braintree/getToken',
+                    url:'/braintree/getToken?'+new Date().getTime(),
                     type:'post',
                     success:function(data){
                         token = data;
@@ -35,7 +35,7 @@
                             // Submit payload.nonce to your server
                             if(confirm("是否继续支付0.01USD?")){
                                 $.ajax({
-                                    url:'/braintree/pay',
+                                    url:'/braintree/pay?'+new Date().getTime(),
                                     type:'post',
                                     data:'nonce='+payload.nonce,
                                     success:function(data){
@@ -86,9 +86,10 @@
                                 onApprove: function (data, actions) {
                                     return paypalCheckoutInstance.tokenizePayment(data, function (err, payload) {
                                         // Submit `payload.nonce` to your server
+                                        debugger;
                                         if(confirm("是否继续支付10.00USD?")){
                                             $.ajax({
-                                                url:'/braintree/pay2',
+                                                url:'/braintree/pay2?'+new Date().getTime(),
                                                 type:'post',
                                                 data:'nonce='+payload.nonce,
                                                 success:function(data){

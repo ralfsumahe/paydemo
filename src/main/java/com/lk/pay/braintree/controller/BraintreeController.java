@@ -3,6 +3,7 @@ package com.lk.pay.braintree.controller;
 import com.alibaba.fastjson.JSON;
 import com.braintreegateway.*;
 import com.lk.pay.Msg;
+import com.lk.pay.utils.GatewayFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,8 +14,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/braintree")
 public class BraintreeController {
-    private static BraintreeGateway gateway = new BraintreeGateway(Environment.SANDBOX,
-            "z3kj2246rsvttk8w","t9fmnr3mwjzyvrtd","76ca70624230236d62e98cf6f174d424");
+    private static BraintreeGateway gateway = GatewayFactory.getlisiGateway();
 
     @PostMapping("/getToken")
     public String getToken(){
@@ -59,30 +59,20 @@ public class BraintreeController {
     public Msg pay2(String nonce) {
         gateway.plan().all().stream().forEach(plan-> System.out.println("id:"+plan.getId()+";name:"+plan.getName()));
 
-
-        //gateway.customer().all().forEach(customer-> gateway.customer().delete(customer.getId()));
-
-        System.out.println(nonce);
-
         CustomerRequest customerRequest = new CustomerRequest()
-                .id("myid11")
-                .firstName("Mark1")
-                .lastName("Jones1")
-                .company("Jones1 Co.")
-                .email("mark1.jones@example.com")
-                .fax("429-555-1234")
-                .phone("624-555-1234")
-                .website("http://example2.com").paymentMethodNonce(nonce);
+                .id(UUID.randomUUID().toString())
+                .paymentMethodNonce(nonce)
+                .firstName("Fred")
+                .lastName("Jones")
+
+                .creditCard().done();
         Result<Customer> customerResult = gateway.customer().create(customerRequest);
-
-
-
 
         Customer customer = gateway.customer().find(customerResult.getTarget().getId());
         String token = customer.getDefaultPaymentMethod().getToken();
 
 
-        SubscriptionRequest subscriptionRequest = new SubscriptionRequest().planId("7qzm").paymentMethodToken(token);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest().planId("jhk2").paymentMethodToken(token);
         Result<Subscription> result = gateway.subscription().create(subscriptionRequest);
 
         System.out.println(JSON.toJSONString(result));

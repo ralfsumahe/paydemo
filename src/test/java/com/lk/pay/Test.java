@@ -2,10 +2,10 @@ package com.lk.pay;
 
 import com.alibaba.fastjson.JSON;
 import com.braintreegateway.*;
+import com.lk.pay.utils.GatewayFactory;
 
 public class Test {
-    private static BraintreeGateway gateway = new BraintreeGateway(Environment.SANDBOX,
-            "z3kj2246rsvttk8w","t9fmnr3mwjzyvrtd","76ca70624230236d62e98cf6f174d424");
+    private static BraintreeGateway gateway = GatewayFactory.getlisiGateway();;
 
     @org.junit.Test
     public void customerTest(){
@@ -28,5 +28,16 @@ public class Test {
 //        System.out.println(gateway.customer().all().getIds());
 //
 //        System.out.println(JSON.toJSONString(gateway.subscription().search(new SubscriptionSearchRequest().merchantAccountId().is("z3kj2246rsvttk8w"))));
+    }
+
+    @org.junit.Test
+    public void getPlan(){
+        gateway.plan().all().forEach(p -> System.out.println(p.getId()));
+    }
+
+
+    @org.junit.Test
+    public void getCustomer(){
+        gateway.customer().all().getIds().forEach(id -> gateway.customer().delete(id));
     }
 }
