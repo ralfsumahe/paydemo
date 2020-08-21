@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ensures optimal rendering on mobile devices. -->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- Optimal Internet Explorer compatibility -->
+    </head>
+
+<body>
+    <script src="https://www.paypal.com/sdk/js?client-id=ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
+    </script>
+
+    <div id="paypal-button-container"></div>
+
+    <script>
+        paypal.Buttons({
+            createOrder: function() {
+                return fetch('/paypal/createOrder', {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                }).then(function(res) {
+                    return res.json();
+                }).then(function(data) {
+                    console.info("orderId："+data.msg.orderID);
+                    return data.msg.orderId; // Use the same key name for order ID on the client and server
+                });
+            },
+            onApprove: function(data) {
+                return fetch('/paypal/captureOrder?orderId='+data.orderID, {
+                    method:"post",
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    // body: JSON.stringify({
+                    //     orderID:
+                    // })
+                }).then(function(res) {
+                    return res.json();
+                }).then(function(details) {
+                    alert("pay complete，orderId: "+details.msg.orderId);
+                })
+            }
+        }).render('#paypal-button-container');
+        // This function displays Smart Payment Buttons on your web page.
+    </script>
+</body>
+
+
+</html>

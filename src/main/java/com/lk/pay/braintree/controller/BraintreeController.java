@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -17,14 +19,16 @@ public class BraintreeController {
     private static BraintreeGateway gateway = GatewayFactory.getlisiGateway();
 
     @PostMapping("/getToken")
-    public String getToken(){
+    public String getToken(HttpServletRequest request, HttpServletResponse response){
         ClientTokenRequest clientTokenRequest = new ClientTokenRequest();
         String clientToken = gateway.clientToken().generate(clientTokenRequest);
+        response.setHeader("Access-Control-Allow-Credentials","true");
+        response.setHeader("Access-Control-Allow-Origin",request.getHeader("Origin"));
         return clientToken;
     }
 
     @PostMapping("/pay")
-    public Msg pay(String nonce) {
+    public Msg pay(String nonce, HttpServletRequest request1, HttpServletResponse response) {
 
 //        CustomerRequest customerRequest = new CustomerRequest()
 //                .firstName("Mark1")
@@ -48,6 +52,10 @@ public class BraintreeController {
                 .done();
 
         Result<Transaction> result = gateway.transaction().sale(request);
+
+        response.setHeader("Access-Control-Allow-Credentials","true");
+        response.setHeader("Access-Control-Allow-Origin",request1.getHeader("Origin"));
+
         if(result.isSuccess()){
             return Msg.ok(result.getTarget().getStatus().toString());
         }else{
@@ -56,7 +64,7 @@ public class BraintreeController {
     }
 
     @PostMapping("/pay2")
-    public Msg pay2(String nonce) {
+    public Msg pay2(String nonce, HttpServletRequest request, HttpServletResponse response) {
         gateway.plan().all().stream().forEach(plan-> System.out.println("id:"+plan.getId()+";name:"+plan.getName()));
 
         CustomerRequest customerRequest = new CustomerRequest()
@@ -76,6 +84,9 @@ public class BraintreeController {
         Result<Subscription> result = gateway.subscription().create(subscriptionRequest);
 
         System.out.println(JSON.toJSONString(result));
+
+        response.setHeader("Access-Control-Allow-Credentials","true");
+        response.setHeader("Access-Control-Allow-Origin",request.getHeader("Origin"));
 
         if(result.isSuccess()){
             return Msg.ok(result.getTarget().getStatus().toString());

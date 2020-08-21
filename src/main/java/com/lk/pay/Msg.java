@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Msg {
+public class Msg<T> {
     private Integer code;
-    private String msg;
+    private T msg;
 
-    public static Msg ok(String msg){
+    public static <T> Msg ok(T msg){
         return Msg.builder().code(0).msg(msg).build();
     }
-    public static Msg fail(String msg){
+    public static <T> Msg fail(T msg){
         return Msg.builder().code(-1).msg(msg).build();
     }
 }
