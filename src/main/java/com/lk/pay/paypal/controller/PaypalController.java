@@ -71,8 +71,6 @@ public class PaypalController {
         OrdersCaptureRequest request = new OrdersCaptureRequest(orderId);
         request.requestBody(new OrderRequest());
 
-        Thread.sleep(5000);
-
         HttpResponse<Order> response = payPalHttpClient.execute(request);
 
         //响应返回编码
