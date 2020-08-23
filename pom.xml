@@ -44,6 +44,11 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.69</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.3.1</version>
+        </dependency>
 
 
         <dependency>

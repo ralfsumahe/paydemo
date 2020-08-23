@@ -1,15 +1,14 @@
 package com.lk.pay.paypal.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 class OrderDto{
     private String orderId;
     private String amount;
+    private String captureId;
 }

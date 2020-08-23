@@ -9,13 +9,16 @@
 <body>
     <script src="https://www.paypal.com/sdk/js?client-id=ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
     </script>
-
+    <input type="radio" name="product" value="产品1"/>产品1
+    <input type="radio" name="product" value="产品2"/>产品2
+    <input type="radio" name="product" value="产品3"/>产品3
     <div id="paypal-button-container"></div>
 
     <script>
+        var product = 1;
         paypal.Buttons({
             createOrder: function() {
-                return fetch('/paypal/createOrder', {
+                return fetch('/paypal/createOrder/'+product, {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json'

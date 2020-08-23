@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ensures optimal rendering on mobile devices. -->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- Optimal Internet Explorer compatibility -->
+        <meta charset="UTF-8"/>
+    </head>
+
+<body>
+<script src="https://www.paypal.com/sdk/js?client-id=ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6&vault=true" data-sdk-integration-source="button-factory"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.2.1/jquery.min.js" crossorigin="anonymous"></script>
+<input type="radio" name="product" value="1"/>产品1
+<input type="radio" name="product" value="2"/>产品2
+<input type="radio" name="product" value="3"/>产品3
+
+<div id="paypal-button-container"></div>
+
+    <script>
+        $(function(){
+            var productId = 1;
+
+            paypal.Buttons({
+                style: {
+                    shape: 'rect',
+                    color: 'blue',
+                    layout: 'vertical',
+                    label: 'subscribe',
+
+                },
+                createSubscription: function(data, actions) {
+                    var planId = null;
+                    $.ajax({
+                        url:'/paypal/getPlanId/'+productId+'?'+new Date().getTime(),
+                        type:'get',
+                        success:function(data){
+                            planId = data.msg;
+                        },
+                        async:false
+                    });
+
+                    return actions.subscription.create({
+                        'plan_id': planId
+                    });
+                },
+                onApprove: function(data, actions) {
+
+                    alert(data.subscriptionID);
+                }
+            }).render('#paypal-button-container');
+        });
+    </script>
+</body>
+
+
+</html>

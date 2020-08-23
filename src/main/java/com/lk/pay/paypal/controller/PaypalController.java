@@ -1,14 +1,16 @@
 package com.lk.pay.paypal.controller;
 
+import cn.hutool.Hutool;
+import cn.hutool.http.HttpUtil;
+import com.braintreegateway.SubscriptionRequest;
 import com.lk.pay.Msg;
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.http.HttpResponse;
 import com.paypal.orders.*;
+import com.paypal.payments.CapturesRefundRequest;
+import com.paypal.payments.Refund;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,9 +21,16 @@ public class PaypalController {
     @Autowired
     private PayPalHttpClient payPalHttpClient;
 
+    //==================================================直接支付=========================================================
 
-    @PostMapping("/createOrder")
-    public Msg<OrderDto> createOrder() throws IOException {
+    /**
+     * 创建订单
+     * @param product
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("/createOrder/{product}")
+    public Msg<OrderDto> createOrder(@PathVariable("product") Integer product) throws IOException {
         OrdersCreateRequest request = new OrdersCreateRequest();
         request.prefer("return=representation");
 
@@ -32,7 +41,7 @@ public class PaypalController {
          *     {
          *       "amount": {
          *         "currency_code": "USD",
-         *         "value": "100.00"
+         *         "value": "0.01"
          *       }
          *     }
          *   ]
@@ -41,28 +50,37 @@ public class PaypalController {
 
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.checkoutPaymentIntent("CAPTURE");
+
         orderRequest.purchaseUnits(new ArrayList<PurchaseUnitRequest>());
         PurchaseUnitRequest purchaseUnit = new PurchaseUnitRequest();
-        purchaseUnit.amountWithBreakdown(new AmountWithBreakdown().value("100.00").currencyCode("USD"));
+        purchaseUnit.amountWithBreakdown(new AmountWithBreakdown().value("0.01").currencyCode("USD"));
         orderRequest.purchaseUnits().add(purchaseUnit);
         request.requestBody(orderRequest);
 
         HttpResponse<Order> response = payPalHttpClient.execute(request);
 
-        //响应编码
-        System.out.println(response.statusCode());
 
-        OrderDto dto = OrderDto.builder()
-                .orderId(response.result().id())
-                .amount(response.result().purchaseUnits().get(0).amountWithBreakdown().value())
-                .build();
+        if (response.statusCode() == 201) {
+            OrderDto dto = OrderDto.builder()
+                    .orderId(response.result().id())
+                    .amount(response.result().purchaseUnits().get(0).amountWithBreakdown().value())
+                    .build();
 
-        System.out.println("订单id:"+dto.getOrderId());
+            return Msg.ok(dto);
+        }else{
+            throw new RuntimeException("createOrder出现异常");
+        }
 
-        return Msg.ok(dto);
 
     }
 
+    /**
+     * 捕获订单
+     * @param orderId
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @PostMapping("/captureOrder")
     public Msg<OrderDto> captureOrder(String orderId) throws IOException, InterruptedException {
 
@@ -73,17 +91,66 @@ public class PaypalController {
 
         HttpResponse<Order> response = payPalHttpClient.execute(request);
 
-        //响应返回编码
-        System.out.println(response.statusCode());
+        if (response.statusCode() == 201) {
+            PurchaseUnit purchaseUnit = response.result().purchaseUnits().get(0);
+            OrderDto dto = OrderDto.builder()
+                    .orderId(response.result().id())
+                    .captureId(response.result().purchaseUnits().get(0).payments().captures().get(0).id()).build();
 
-        System.out.println(response.result().id());
-
-        PurchaseUnit purchaseUnit = response.result().purchaseUnits().get(0);
-        OrderDto dto = OrderDto.builder()
-                .orderId(response.result().id()).build();
-
-        return Msg.ok(dto);
+            System.out.println("dto:"+dto);
+            return Msg.ok(dto);
+        }else{
+            throw new RuntimeException("captureOrder出现异常");
+        }
     }
+
+    /**
+     * 订单退款
+     * @param orderId
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("/refundOrder/{orderId}")
+    public Msg<Boolean> refundOrder(@PathVariable("orderId") String orderId) throws IOException {
+        OrdersGetRequest ordersGetRequest = new OrdersGetRequest(orderId);
+        HttpResponse<Order> orderHttpResponse = payPalHttpClient.execute(ordersGetRequest);
+        String captureId  = orderHttpResponse.result().purchaseUnits().get(0).payments().captures().get(0).id();
+
+        CapturesRefundRequest capturesRefundRequest = new CapturesRefundRequest(captureId);
+        HttpResponse<Refund> refundHttpResponse = payPalHttpClient.execute(capturesRefundRequest);
+        if ((refundHttpResponse.statusCode()>=200 && refundHttpResponse.statusCode() < 300)) {
+            return Msg.ok(true);
+        }else{
+            throw new RuntimeException("refundOrder出现异常");
+        }
+
+    }
+
+
+
+    //=======================================================订阅=======================================================
+
+    /**
+     * 获取计划id
+     * @param product
+     * @return
+     */
+    @GetMapping("/getPlanId/{product}")
+    public Msg<String> getPlanId(@PathVariable("product") Integer product){
+        return Msg.ok("P-7DU86670Y0757653ML5ATFMA");
+    }
+
+    @PostMapping("/subscription")
+    public Msg<Boolean> subscription(){
+        return Msg.ok(true);
+    }
+
+    @PostMapping("/unSubscription")
+    public Msg<Boolean> unSubscription(){
+       return null;
+    }
+
+
 
 
 }
