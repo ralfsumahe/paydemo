@@ -105,6 +105,10 @@ public class PaypalController {
     }
 
     /**
+     * 查询用户订单列表
+     */
+
+    /**
      * 订单退款
      * @param orderId
      * @return
@@ -140,15 +144,31 @@ public class PaypalController {
         return Msg.ok("P-7DU86670Y0757653ML5ATFMA");
     }
 
+    /**
+     * 订阅
+     * @return
+     */
     @PostMapping("/subscription")
     public Msg<Boolean> subscription(){
         return Msg.ok(true);
     }
 
+    /**
+     * 取消订阅
+     * @return
+     */
     @PostMapping("/unSubscription")
     public Msg<Boolean> unSubscription(){
        return null;
     }
+
+    /**
+     * 查询用户订阅列表
+     */
+
+    /**
+     * 查询用户订阅详细交易
+     */
 
 
 
