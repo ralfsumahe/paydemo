@@ -32,7 +32,7 @@
             },
             onApprove: function(data) {
                 console.info("订单id："+data.orderID);
-                return fetch('/paypal/captureOrder?orderId='+data.orderID, {
+                return fetch('/paypal/captureOrder/'+data.orderID, {
                     method:"post",
                     headers: {
                         'content-type': 'application/json'

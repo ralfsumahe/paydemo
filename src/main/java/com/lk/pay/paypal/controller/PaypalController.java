@@ -12,6 +12,8 @@ import com.paypal.payments.Refund;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -30,23 +32,13 @@ public class PaypalController {
      * @throws IOException
      */
     @PostMapping("/createOrder/{product}")
-    public Msg<OrderDto> createOrder(@PathVariable("product") Integer product) throws IOException {
+    public Msg<OrderDto> createOrder(@PathVariable("product") Integer product, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse) throws IOException {
+        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
+        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
+
         OrdersCreateRequest request = new OrdersCreateRequest();
         request.prefer("return=representation");
 
-        /**
-         * {
-         *   "intent": "CAPTURE",
-         *   "purchase_units": [
-         *     {
-         *       "amount": {
-         *         "currency_code": "USD",
-         *         "value": "0.01"
-         *       }
-         *     }
-         *   ]
-         * }'
-         */
 
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.checkoutPaymentIntent("CAPTURE");
@@ -58,6 +50,7 @@ public class PaypalController {
         request.requestBody(orderRequest);
 
         HttpResponse<Order> response = payPalHttpClient.execute(request);
+
 
 
         if (response.statusCode() == 201) {
@@ -81,8 +74,11 @@ public class PaypalController {
      * @throws IOException
      * @throws InterruptedException
      */
-    @PostMapping("/captureOrder")
-    public Msg<OrderDto> captureOrder(String orderId) throws IOException, InterruptedException {
+    @PostMapping("/captureOrder/{orderId}")
+    public Msg<OrderDto> captureOrder(@PathVariable("orderId") String orderId, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse) throws IOException, InterruptedException {
+        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
+        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
+
 
         System.out.println("订单id:"+orderId);
 
@@ -90,6 +86,7 @@ public class PaypalController {
         request.requestBody(new OrderRequest());
 
         HttpResponse<Order> response = payPalHttpClient.execute(request);
+
 
         if (response.statusCode() == 201) {
             PurchaseUnit purchaseUnit = response.result().purchaseUnits().get(0);
@@ -115,7 +112,10 @@ public class PaypalController {
      * @throws IOException
      */
     @PostMapping("/refundOrder/{orderId}")
-    public Msg<Boolean> refundOrder(@PathVariable("orderId") String orderId) throws IOException {
+    public Msg<Boolean> refundOrder(@PathVariable("orderId") String orderId, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse) throws IOException {
+        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
+        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
+
         OrdersGetRequest ordersGetRequest = new OrdersGetRequest(orderId);
         HttpResponse<Order> orderHttpResponse = payPalHttpClient.execute(ordersGetRequest);
         String captureId  = orderHttpResponse.result().purchaseUnits().get(0).payments().captures().get(0).id();
@@ -140,7 +140,10 @@ public class PaypalController {
      * @return
      */
     @GetMapping("/getPlanId/{product}")
-    public Msg<String> getPlanId(@PathVariable("product") Integer product){
+    public Msg<String> getPlanId(@PathVariable("product") Integer product, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
+        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
+        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
+
         return Msg.ok("P-7DU86670Y0757653ML5ATFMA");
     }
 
@@ -149,7 +152,10 @@ public class PaypalController {
      * @return
      */
     @PostMapping("/subscription")
-    public Msg<Boolean> subscription(){
+    public Msg<Boolean> subscription(HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
+        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
+        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
+
         return Msg.ok(true);
     }
 
@@ -158,7 +164,10 @@ public class PaypalController {
      * @return
      */
     @PostMapping("/unSubscription")
-    public Msg<Boolean> unSubscription(){
+    public Msg<Boolean> unSubscription(HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
+        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
+        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
+
        return null;
     }
 
