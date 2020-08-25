@@ -29,8 +29,8 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info("订单idorderId:"+data.msg.orderId);
-                    return data.msg.orderId; // Use the same key name for order ID on the client and server
+                    console.info("订单idorderId:"+data.msg.paypalOrderId);
+                    return data.msg.paypalOrderId; // Use the same key name for order ID on the client and server
                 });
             },
             onApprove: function(data) {
@@ -46,7 +46,7 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(details) {
-                    alert("pay complete,orderId:"+details.msg.orderId);
+                    alert("pay complete,orderId:"+details.msg.paypalOrderId);
                 })
             }
         }).render('#paypal-button-container');

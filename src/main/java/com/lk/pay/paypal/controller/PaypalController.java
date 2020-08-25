@@ -32,7 +32,7 @@ public class PaypalController {
      * @throws IOException
      */
     @PostMapping("/createOrder")
-    public Msg<OrderDto> createOrder(@RequestBody PaypalCreateOrderVo paypalCreateOrderVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse) throws IOException {
+    public Msg<PaypalOrderDto> createOrder(@RequestBody PaypalCreateOrderVo paypalCreateOrderVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse) throws IOException {
         httpresponse.setHeader("Access-Control-Allow-Credentials","true");
         httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
 
@@ -54,9 +54,8 @@ public class PaypalController {
 
 
         if (response.statusCode() == 201) {
-            OrderDto dto = OrderDto.builder()
-                    .orderId(response.result().id())
-                    .orderStatus(response.result().status())
+            PaypalOrderDto dto = PaypalOrderDto.builder()
+                    .paypalOrderId(response.result().id())
                     .amount(response.result().purchaseUnits().get(0).amountWithBreakdown().value())
                     .build();
             System.out.println(dto);
@@ -77,7 +76,7 @@ public class PaypalController {
      * @throws InterruptedException
      */
     @PostMapping("/captureOrder")
-    public Msg<OrderDto> captureOrder(@RequestBody PaypalCaptureOrderVo paypalCaptureOrderVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse) throws IOException, InterruptedException {
+    public Msg<PaypalOrderDto> captureOrder(@RequestBody PaypalCaptureOrderVo paypalCaptureOrderVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse) throws IOException, InterruptedException {
         httpresponse.setHeader("Access-Control-Allow-Credentials","true");
         httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
 
@@ -90,12 +89,11 @@ public class PaypalController {
         HttpResponse<Order> response = payPalHttpClient.execute(request);
 
 
-        if (response.statusCode() == 201) {
+        if (response.statusCode() > 200 && response.statusCode() < 300) {
             PurchaseUnit purchaseUnit = response.result().purchaseUnits().get(0);
-            OrderDto dto = OrderDto.builder()
-                    .orderId(response.result().id())
-                    .orderStatus(response.result().status())
-                    .captureId(response.result().purchaseUnits().get(0).payments().captures().get(0).id()).build();
+            PaypalOrderDto dto = PaypalOrderDto.builder()
+                    .paypalOrderId(response.result().id())
+                    .paypalCaptureId(response.result().purchaseUnits().get(0).payments().captures().get(0).id()).build();
 
             System.out.println("dto:"+dto);
             return Msg.ok(dto);
@@ -104,34 +102,6 @@ public class PaypalController {
         }
     }
 
-    /**
-     * 查询用户订单列表
-     */
-
-    /**
-     * 订单退款
-     * @param paypalRefundOrderVo
-     * @return
-     * @throws IOException
-     */
-    @PostMapping("/refundOrder")
-    public Msg<Boolean> refundOrder(@RequestBody PaypalRefundOrderVo paypalRefundOrderVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse) throws IOException {
-        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
-        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
-
-        OrdersGetRequest ordersGetRequest = new OrdersGetRequest(paypalRefundOrderVo.getPaypalOrderId());
-        HttpResponse<Order> orderHttpResponse = payPalHttpClient.execute(ordersGetRequest);
-        String captureId  = orderHttpResponse.result().purchaseUnits().get(0).payments().captures().get(0).id();
-
-        CapturesRefundRequest capturesRefundRequest = new CapturesRefundRequest(captureId);
-        HttpResponse<Refund> refundHttpResponse = payPalHttpClient.execute(capturesRefundRequest);
-        if ((refundHttpResponse.statusCode()>=200 && refundHttpResponse.statusCode() < 300)) {
-            return Msg.ok(true);
-        }else{
-            throw new RuntimeException("refundOrder出现异常");
-        }
-
-    }
 
 
 
@@ -142,7 +112,7 @@ public class PaypalController {
      * @return
      */
     @PostMapping("/createSubscription")
-    public Msg<Boolean> createSubscription(@RequestBody PaypalCreateSubscriptionVo paypalCreateSubscriptionVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
+    public Msg<PaypalSubscriptionDto> createSubscription(@RequestBody PaypalCreateSubscriptionVo paypalCreateSubscriptionVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
         httpresponse.setHeader("Access-Control-Allow-Credentials","true");
         httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
 
@@ -160,13 +130,13 @@ public class PaypalController {
         cn.hutool.http.HttpResponse httpResponse = request.execute();
         JSONObject result = (JSONObject)JSONObject.parse(httpResponse.body());
         String subscriptionId = result.getString("id");
-        OrderDto dto = OrderDto.builder().subscriptionId(subscriptionId).build();
+        PaypalSubscriptionDto dto = PaypalSubscriptionDto.builder().paypalSubscriptionId(subscriptionId).build();
 
         return Msg.ok(dto);
     }
 
     /**
-     * 取消订阅
+     * 捕获订阅
      * @return
      */
     @PostMapping("/captureSubscription")
@@ -176,28 +146,6 @@ public class PaypalController {
 
         return Msg.ok(true);
     }
-
-    /**
-     * 取消订阅
-     * @return
-     */
-    @PostMapping("/unSubscription")
-    public Msg<Boolean> unSubscription(HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
-        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
-        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
-
-       return null;
-    }
-
-    /**
-     * 查询用户订阅列表
-     */
-
-    /**
-     * 查询用户订阅详细交易
-     */
-
-
 
     private String getToken(){
         String token = null;

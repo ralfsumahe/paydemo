@@ -39,8 +39,8 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info("订单idorderId:"+data.msg.subscriptionId);
-                    return data.msg.subscriptionId; // Use the same key name for order ID on the client and server
+                    console.info("订单idorderId:"+data.msg.paypalSubscriptionId);
+                    return data.msg.paypalSubscriptionId; // Use the same key name for order ID on the client and server
                 });
             },
             onApprove: function(data, actions) {
