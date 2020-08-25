@@ -28,7 +28,7 @@
 
             },
             createSubscription:function(){
-                return fetch('/paypal/createSubscription', {
+                return fetch('/pay/paypal/createSubscription', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json'
@@ -44,7 +44,7 @@
                 });
             },
             onApprove: function(data, actions) {
-                return fetch('/paypal/captureSubscription', {
+                return fetch('/pay/paypal/captureSubscription', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json'

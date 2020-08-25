@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping("/paypal")
+@RequestMapping("/pay/paypal")
 public class PaypalController {
     @Autowired
     private PayPalHttpClient payPalHttpClient;
