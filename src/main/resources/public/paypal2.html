@@ -44,10 +44,23 @@
                 });
             },
             onApprove: function(data, actions) {
-
-                alert(data.subscriptionID);
+                return fetch('/paypal/captureSubscription', {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'paypalSubscriptionId':data.subscriptionID
+                    })
+                }).then(function(res) {
+                    return res.json();
+                }).then(function(data) {
+                    if(data.msg == true){
+                        alert("后端保存成功");
+                    }
+                });
             }
-        }).render('#paypal-button-container');
+        }).render('#paypal-button-container');//data.subscriptionID
     });
 </script>
 </body>

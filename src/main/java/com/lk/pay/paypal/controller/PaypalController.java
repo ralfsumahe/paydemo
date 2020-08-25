@@ -169,6 +169,18 @@ public class PaypalController {
      * 取消订阅
      * @return
      */
+    @PostMapping("/captureSubscription")
+    public Msg<Boolean> captureSubscription(@RequestBody PaypalCaptureSubscriptionVo paypalCaptureSubscriptionVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
+        httpresponse.setHeader("Access-Control-Allow-Credentials","true");
+        httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
+
+        return Msg.ok(true);
+    }
+
+    /**
+     * 取消订阅
+     * @return
+     */
     @PostMapping("/unSubscription")
     public Msg<Boolean> unSubscription(HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
         httpresponse.setHeader("Access-Control-Allow-Credentials","true");
