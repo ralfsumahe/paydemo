@@ -1,11 +1,14 @@
 package com.lk.pay;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Date;
 
 public class HutoolTest {
     private String token = null;
@@ -53,5 +56,17 @@ public class HutoolTest {
                 .header("Authorization", "Bearer "+token)
                 .body(jo.toJSONString());
         System.out.println(httpRequest.execute());
+    }
+    @Test
+    public void testTime(){
+        String str = "2020-08-25T08:19:33.585Z";
+        Date date = DateUtil.parse(str,"yyyy-MM-ddHH:mm:ss.SSSS".replace("/T|Z/",""));
+        System.out.println(DateUtil.format(date, "yyyy-MM-dd HH:mm:ss,SSS"));
+    }
+
+    public static void main(String[] args) {
+        String str = "2020-08-25T08:19:33.585Z".replaceAll("T|Z","");
+        Date date = DateUtil.parse(str,"yyyy-MM-ddHH:mm:ss.SSS");
+        System.out.println(DateUtil.format(date, "yyyy-MM-dd HH:mm:ss,SSS"));
     }
 }

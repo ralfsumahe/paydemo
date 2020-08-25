@@ -18,10 +18,11 @@
         var productId = 1;
         paypal.Buttons({
             createOrder: function() {
-                return fetch('/pay/paypal/createOrder', {
+                return fetch('http://localhost:8081/pay/paypal/createOrder', {
                     method: 'post',
                     headers: {
-                        'content-type': 'application/json'
+                        'content-type': 'application/json',
+                        'token':'60e26744b9044299984dee834c068c75'
                     },
                     body: JSON.stringify({
                         'productId':productId
@@ -29,16 +30,18 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info(data);
-                    return data.msg.paypalOrderId; // Use the same key name for order ID on the client and server
+                    console.info(data.data.paypalOrderId);
+                    return data.data.paypalOrderId; // Use the same key name for order ID on the client and server
                 });
             },
             onApprove: function(data) {
+                debugger;
                 console.info("订单id："+data.orderID);
-                return fetch('/pay/paypal/captureOrder', {
+                return fetch('http://localhost:8081/pay/paypal/captureOrder', {
                     method:"post",
                     headers: {
-                        'content-type': 'application/json'
+                        'content-type': 'application/json',
+                        'token':'60e26744b9044299984dee834c068c75'
                     },
                     body: JSON.stringify({
                         'paypalOrderId':data.orderID
@@ -46,8 +49,8 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(details) {
-                    console.info(details)
-                    alert("pay complete,orderId:"+details.msg.paypalOrderId);
+                    console.info(details.data)
+                    alert("pay complete,orderId:"+details.data.paypalOrderId);
                 })
             }
         }).render('#paypal-button-container');

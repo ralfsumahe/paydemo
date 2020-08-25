@@ -1,9 +1,12 @@
 package com.lk.pay.paypal.controller;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -78,6 +81,34 @@ public class PaypalWebhookController {
             response.setStatus(500);
         }
         return str;
+    }
+
+    @PostMapping("/verify")
+    public void verify(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String str = HttpUtil.getString(request.getInputStream(), Charset.forName("utf-8"),true);
+        JSONObject jo = (JSONObject) JSONObject.parse(str);
+
+        HttpRequest httpRequest = HttpRequest.post("https://api.sandbox.paypal.com/v1/notifications/verify-webhook-signature")
+                .contentType("application/json")
+                .header("Authorization", "Bearer "+getToken())
+                .body(jo.toJSONString());
+
+
+        HttpResponse httpResponse = httpRequest.execute();
+        System.out.println(httpResponse.body());
+    }
+
+
+    private String getToken(){
+        String token = null;
+        HttpRequest request = HttpRequest.post("https://api.sandbox.paypal.com/v1/oauth2/token").basicAuth(
+                "ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6",
+                "EGQzXV9F46OEBFBZHNkk04CAIXRwZW1r4K6X40anp2RKL4dYa4q-11qLxcuW1fyHZ-DA01Y9Oa_xC86j")
+                .form("grant_type", "client_credentials");
+        cn.hutool.http.HttpResponse response = request.execute();
+        JSONObject result = (JSONObject)JSONObject.parse(response.body());
+        token = result.getString("access_token");
+        return token;
     }
 
 }

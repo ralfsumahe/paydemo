@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Msg<T> {
     private Integer code;
-    private T msg;
+    private T data;
 
     public static <T> Msg ok(T msg){
-        return Msg.builder().code(0).msg(msg).build();
+        return Msg.builder().code(0).data(msg).build();
     }
     public static <T> Msg fail(T msg){
-        return Msg.builder().code(-1).msg(msg).build();
+        return Msg.builder().code(-1).data(msg).build();
     }
 }
