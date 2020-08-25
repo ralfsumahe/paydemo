@@ -15,14 +15,17 @@
     <div id="paypal-button-container"></div>
 
     <script>
-        var product = 1;
+        var productId = 1;
         paypal.Buttons({
             createOrder: function() {
-                return fetch('/paypal/createOrder/'+product, {
+                return fetch('/paypal/createOrder', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({
+                        'productId':productId
+                    })
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
@@ -32,14 +35,14 @@
             },
             onApprove: function(data) {
                 console.info("订单id："+data.orderID);
-                return fetch('/paypal/captureOrder/'+data.orderID, {
+                return fetch('/paypal/captureOrder', {
                     method:"post",
                     headers: {
                         'content-type': 'application/json'
                     },
-                    // body: JSON.stringify({
-                    //     orderID:
-                    // })
+                    body: JSON.stringify({
+                        'paypalOrderId':data.orderID
+                    })
                 }).then(function(res) {
                     return res.json();
                 }).then(function(details) {

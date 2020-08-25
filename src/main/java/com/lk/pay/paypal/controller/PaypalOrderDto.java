@@ -7,10 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-class OrderDto{
-    private String orderId;
-    private String orderStatus;
+public class PaypalOrderDto {
+    private String paypalOrderId;
     private String amount;
-    private String captureId;
+    private String paypalCaptureId;
     private String subscriptionId;
 }
