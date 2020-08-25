@@ -39,7 +39,7 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info("订单idorderId:"+data.msg.paypalSubscriptionId);
+                    console.info(data);
                     return data.msg.paypalSubscriptionId; // Use the same key name for order ID on the client and server
                 });
             },
@@ -55,9 +55,8 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    if(data.msg == true){
-                        alert("后端保存成功");
-                    }
+                    console.info(data);
+                    alert("后端保存成功");
                 });
             }
         }).render('#paypal-button-container');//data.subscriptionID

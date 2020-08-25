@@ -29,7 +29,7 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info("订单idorderId:"+data.msg.paypalOrderId);
+                    console.info(data);
                     return data.msg.paypalOrderId; // Use the same key name for order ID on the client and server
                 });
             },
@@ -46,6 +46,7 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(details) {
+                    console.info(details)
                     alert("pay complete,orderId:"+details.msg.paypalOrderId);
                 })
             }

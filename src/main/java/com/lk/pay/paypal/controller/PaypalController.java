@@ -56,6 +56,7 @@ public class PaypalController {
         if (response.statusCode() == 201) {
             PaypalOrderDto dto = PaypalOrderDto.builder()
                     .paypalOrderId(response.result().id())
+                    .productName("会员包月")
                     .amount(response.result().purchaseUnits().get(0).amountWithBreakdown().value())
                     .build();
             System.out.println(dto);
@@ -91,11 +92,22 @@ public class PaypalController {
 
         if (response.statusCode() > 200 && response.statusCode() < 300) {
             PurchaseUnit purchaseUnit = response.result().purchaseUnits().get(0);
-            PaypalOrderDto dto = PaypalOrderDto.builder()
-                    .paypalOrderId(response.result().id())
-                    .paypalCaptureId(response.result().purchaseUnits().get(0).payments().captures().get(0).id()).build();
-
-            System.out.println("dto:"+dto);
+            PaypalOrderDto dto;
+            if(response.result().status().equals("COMPLETED")){
+                dto = PaypalOrderDto.builder()
+                        .paypalOrderId(response.result().id())
+                        .productName("会员包月")
+                        .isComplete(true)
+                        .status(response.result().status())
+                        .paypalCaptureId(response.result().purchaseUnits().get(0).payments().captures().get(0).id()).build();
+            }else{
+                dto = PaypalOrderDto.builder()
+                        .paypalOrderId(response.result().id())
+                        .productName("会员包月")
+                        .isComplete(false)
+                        .status(response.result().status())
+                        .paypalCaptureId(response.result().purchaseUnits().get(0).payments().captures().get(0).id()).build();
+            }
             return Msg.ok(dto);
         }else{
             throw new RuntimeException("captureOrder出现异常");
@@ -130,7 +142,11 @@ public class PaypalController {
         cn.hutool.http.HttpResponse httpResponse = request.execute();
         JSONObject result = (JSONObject)JSONObject.parse(httpResponse.body());
         String subscriptionId = result.getString("id");
-        PaypalSubscriptionDto dto = PaypalSubscriptionDto.builder().paypalSubscriptionId(subscriptionId).build();
+        PaypalSubscriptionDto dto = PaypalSubscriptionDto.builder()
+                .paypalSubscriptionId(subscriptionId)
+                .amount("14,25...")
+                .productName("会员连续包月")
+                .build();
 
         return Msg.ok(dto);
     }
@@ -140,11 +156,39 @@ public class PaypalController {
      * @return
      */
     @PostMapping("/captureSubscription")
-    public Msg<Boolean> captureSubscription(@RequestBody PaypalCaptureSubscriptionVo paypalCaptureSubscriptionVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
+    public Msg<PaypalSubscriptionDto> captureSubscription(@RequestBody PaypalCaptureSubscriptionVo paypalCaptureSubscriptionVo, HttpServletRequest httpServletRequest, HttpServletResponse httpresponse){
         httpresponse.setHeader("Access-Control-Allow-Credentials","true");
         httpresponse.setHeader("Access-Control-Allow-Origin",httpServletRequest.getHeader("Origin"));
 
-        return Msg.ok(true);
+        HttpRequest request = HttpRequest.get("https://api.sandbox.paypal.com/v1/billing/subscriptions/"+paypalCaptureSubscriptionVo.getPaypalSubscriptionId())
+                .contentType("application/json")
+                .header("Authorization","Bearer "+getToken());
+
+        cn.hutool.http.HttpResponse httpResponse = request.execute();
+
+        JSONObject result = (JSONObject)JSONObject.parse(httpResponse.body());
+        System.out.println(result);
+        String status = result.getString("status");
+
+        PaypalSubscriptionDto dto;
+        if("ACTIVE".equals(status)){
+            dto = PaypalSubscriptionDto.builder()
+                    .paypalSubscriptionId(paypalCaptureSubscriptionVo.getPaypalSubscriptionId())
+                    .amount("14,25...")
+                    .productName("会员连续包月")
+                    .status(status)
+                    .isComplete(true)
+                    .build();
+        }else{
+            dto = PaypalSubscriptionDto.builder()
+                    .paypalSubscriptionId(paypalCaptureSubscriptionVo.getPaypalSubscriptionId())
+                    .amount("14,25...")
+                    .productName("会员连续包月")
+                    .status(status)
+                    .isComplete(false)
+                    .build();
+        }
+        return Msg.ok(dto);
     }
 
     private String getToken(){

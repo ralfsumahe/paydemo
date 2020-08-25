@@ -8,8 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class PaypalSubscriptionDto {
-    private String paypalOrderId;
     private String amount;
-    private String paypalCaptureId;
+    private String productName;
     private String paypalSubscriptionId;
+    private Boolean isComplete;
+    private String status;
 }

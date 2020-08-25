@@ -8,8 +8,28 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class PaypalOrderDto {
+    /**
+     * paypal订单id
+     */
     private String paypalOrderId;
+    /**
+     * 产品名称
+     */
+    private String productName;
+    /**
+     * 金额
+     */
     private String amount;
+    /**
+     * paypal捕获id
+     */
     private String paypalCaptureId;
-    private String subscriptionId;
+    /**
+     * 是否完成交易
+     */
+    private Boolean isComplete;
+    /**
+     * 状态
+     */
+    private String status;
 }
