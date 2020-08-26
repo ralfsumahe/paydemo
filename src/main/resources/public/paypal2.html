@@ -39,8 +39,8 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info(data);
-                    return data.msg.paypalSubscriptionId; // Use the same key name for order ID on the client and server
+                    console.info(data.data);
+                    return data.data.paypalSubscriptionId; // Use the same key name for order ID on the client and server
                 });
             },
             onApprove: function(data, actions) {
@@ -55,7 +55,7 @@
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info(data);
+                    console.info(data.data);
                     alert("后端保存成功");
                 });
             }

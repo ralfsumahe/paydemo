@@ -18,7 +18,7 @@
         var productId = 1;
         paypal.Buttons({
             createOrder: function() {
-                return fetch('http://localhost:8081/pay/paypal/createOrder', {
+                return fetch('http://localhost:8080/pay/paypal/createOrder', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json',
@@ -37,7 +37,7 @@
             onApprove: function(data) {
                 debugger;
                 console.info("订单id："+data.orderID);
-                return fetch('http://localhost:8081/pay/paypal/captureOrder', {
+                return fetch('http://localhost:8080/pay/paypal/captureOrder', {
                     method:"post",
                     headers: {
                         'content-type': 'application/json',
