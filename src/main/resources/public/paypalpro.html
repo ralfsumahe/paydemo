@@ -7,7 +7,7 @@
     </head>
 
 <body>
-    <script src="https://www.paypal.com/sdk/js?client-id=ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
+    <script src="https://www.paypal.com/sdk/js?client-id=AQyTqyGRJzYBah1FPBdXXnXRUr7s4L2mA8g47pCswdqFhRfqquywsMn_JFHYPHfhJfNxhWSBpTQ-WqN3"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
     </script>
     <input type="radio" name="product" value="产品1"/>产品1
     <input type="radio" name="product" value="产品2"/>产品2
@@ -18,7 +18,7 @@
         var productId = 1;
         paypal.Buttons({
             createOrder: function() {
-                return fetch('http://192.168.1.19:8080/pay/paypal/createOrder', {
+                return fetch('http://localhost:8080/pay/paypal/createOrder', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json',
@@ -37,7 +37,7 @@
             onApprove: function(data) {
                 debugger;
                 console.info("订单id："+data.orderID);
-                return fetch('http://192.168.1.19:8080/pay/paypal/captureOrder', {
+                return fetch('http://localhost:8080/pay/paypal/captureOrder', {
                     method:"post",
                     headers: {
                         'content-type': 'application/json',

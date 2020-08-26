@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<script src="https://www.paypal.com/sdk/js?client-id=ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6&vault=true" data-sdk-integration-source="button-factory"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AQyTqyGRJzYBah1FPBdXXnXRUr7s4L2mA8g47pCswdqFhRfqquywsMn_JFHYPHfhJfNxhWSBpTQ-WqN3&vault=true" data-sdk-integration-source="button-factory"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.2.1/jquery.min.js" crossorigin="anonymous"></script>
 <input type="radio" name="product" value="1"/>产品1
 <input type="radio" name="product" value="2"/>产品2
@@ -28,7 +28,7 @@
 
             },
             createSubscription:function(){
-                return fetch('http://192.168.1.19:8080/pay/paypal/createSubscription', {
+                return fetch('/pay/paypal/createSubscription', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json'
@@ -44,7 +44,7 @@
                 });
             },
             onApprove: function(data, actions) {
-                return fetch('http://192.168.1.19:8080/pay/paypal/captureSubscription', {
+                return fetch('/pay/paypal/captureSubscription', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json'
