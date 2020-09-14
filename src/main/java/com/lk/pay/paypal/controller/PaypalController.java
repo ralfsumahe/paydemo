@@ -6,15 +6,17 @@ import com.lk.pay.Msg;
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.http.HttpResponse;
 import com.paypal.orders.*;
-import com.paypal.payments.CapturesRefundRequest;
-import com.paypal.payments.Refund;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/pay/paypal")
@@ -45,6 +47,7 @@ public class PaypalController {
 
         orderRequest.purchaseUnits(new ArrayList<PurchaseUnitRequest>());
         PurchaseUnitRequest purchaseUnit = new PurchaseUnitRequest();
+        purchaseUnit.customId("订单id："+UUID.randomUUID());
         purchaseUnit.amountWithBreakdown(new AmountWithBreakdown().value("0.01").currencyCode("USD"));
         orderRequest.purchaseUnits().add(purchaseUnit);
         request.requestBody(orderRequest);

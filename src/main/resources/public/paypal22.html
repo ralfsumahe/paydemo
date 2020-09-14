@@ -14,7 +14,6 @@
 
 <script>
     $(function(){
-        var productId = 1;
 
         paypal.Buttons({
             style: {
@@ -25,34 +24,38 @@
 
             },
             createSubscription:function(){
-                return fetch('http://localhost:8081/pay/paypal/createSubscription', {
+                return fetch('http://localhost:8080/pay/vip/createSubscript', {
                     method: 'post',
                     headers: {
-                        'content-type': 'application/json'
+                        'content-type': 'application/json',
+                        'token':'86f9d0859be547ce8d2aea65c94044b1'
                     },
                     body: JSON.stringify({
-                        'productId':productId
+                        'productId':99,
+                        'channel':'paypal'
                     })
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
                     console.info(data.data);
-                    return data.data.paypalSubscriptionId; // Use the same key name for order ID on the client and server
+                    return data.data.outSubscriptNo; // Use the same key name for order ID on the client and server
                 });
             },
             onApprove: function(data, actions) {
-                return fetch('http://localhost:8081/pay/paypal/captureSubscription', {
+                return fetch('http://localhost:8080/pay/vip/paySubscript', {
                     method: 'post',
                     headers: {
-                        'content-type': 'application/json'
+                        'content-type': 'application/json',
+                        'token':'86f9d0859be547ce8d2aea65c94044b1'
                     },
                     body: JSON.stringify({
-                        'paypalSubscriptionId':data.subscriptionID
+                        'outSubscriptNo':data.subscriptionID,
+                        'channel':'paypal'
                     })
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info(data.data);
+                    console.info(data.data.complete);
                     alert("后端保存成功");
                 });
             }

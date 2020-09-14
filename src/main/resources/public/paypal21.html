@@ -7,50 +7,50 @@
     </head>
 
 <body>
-    <script src="https://www.paypal.com/sdk/js?client-id=AQyTqyGRJzYBah1FPBdXXnXRUr7s4L2mA8g47pCswdqFhRfqquywsMn_JFHYPHfhJfNxhWSBpTQ-WqN3"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
+    <script src="https://www.paypal.com/sdk/js?client-id=ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
     </script>
-    <input type="radio" name="product" value="产品1"/>产品1
-    <input type="radio" name="product" value="产品2"/>产品2
-    <input type="radio" name="product" value="产品3"/>产品3
-    <div id="paypal-button-container"></div>
+    <div id="paypal-button-container">
+        <input type="hidden" name="custom" value="orderId"/>
+    </div>
 
     <script>
-        var productId = 1;
         paypal.Buttons({
             createOrder: function() {
-                return fetch('http://localhost:8081/pay/paypal/createOrder', {
+                return fetch('http://localhost:8080/pay/vip/createOrder', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json',
-                        'token':'60e26744b9044299984dee834c068c75'
+                        'token':'86f9d0859be547ce8d2aea65c94044b1'
                     },
                     body: JSON.stringify({
-                        'productId':productId
+                        'productId':99,
+                        'channel':'paypal'
                     })
                 }).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    console.info(data.data.paypalOrderId);
-                    return data.data.paypalOrderId; // Use the same key name for order ID on the client and server
+                    console.info(data.data.outOrderNo);
+                    return data.data.outOrderNo; // Use the same key name for order ID on the client and server
                 });
             },
             onApprove: function(data) {
                 debugger;
                 console.info("订单id："+data.orderID);
-                return fetch('http://localhost:8081/pay/paypal/captureOrder', {
+                return fetch('http://localhost:8080/pay/vip/payOrder', {
                     method:"post",
                     headers: {
                         'content-type': 'application/json',
-                        'token':'60e26744b9044299984dee834c068c75'
+                        'token':'86f9d0859be547ce8d2aea65c94044b1'
                     },
                     body: JSON.stringify({
-                        'paypalOrderId':data.orderID
+                        'outOrderNo':data.orderID,
+                        'channel':'paypal'
                     })
                 }).then(function(res) {
                     return res.json();
                 }).then(function(details) {
                     console.info(details.data)
-                    alert("pay complete,orderId:"+details.data.paypalOrderId);
+                    alert("pay complete,orderId:"+details.data.complete);
                 })
             }
         }).render('#paypal-button-container');
