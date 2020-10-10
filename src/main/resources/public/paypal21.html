@@ -7,53 +7,113 @@
     </head>
 
 <body>
-    <script src="https://www.paypal.com/sdk/js?client-id=ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
+    <script src="https://www.paypal.com/sdk/js?client-id=ATN8f09gmB9Njm0iuoyApCV04GXbhbfltRzQPMHtjEL3i2oIZO0ShB31nIczY_hK1W0bVbYRUQaKIer6&components=buttons,funding-eligibility"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
     </script>
     <div id="paypal-button-container">
         <input type="hidden" name="custom" value="orderId"/>
     </div>
 
     <script>
-        paypal.Buttons({
-            createOrder: function() {
-                return fetch('http://localhost:8080/pay/vip/createOrder', {
-                    method: 'post',
-                    headers: {
-                        'content-type': 'application/json',
-                        'token':'86f9d0859be547ce8d2aea65c94044b1'
-                    },
-                    body: JSON.stringify({
-                        'productId':99,
-                        'channel':'paypal'
+        var FUNDING_SOURCES = [
+            paypal.FUNDING.PAYPAL
+            // paypal.FUNDING.VENMO,
+            // paypal.FUNDING.CREDIT,
+            // paypal.FUNDING.CARD
+        ];
+
+        FUNDING_SOURCES.forEach(function(fundingSource) {
+
+            // Initialize the buttons
+            var button = paypal.Buttons({
+                fundingSource: fundingSource,
+                createOrder: function() {
+                    return fetch('http://localhost:8080/pay/vip/createOrder', {
+                        method: 'post',
+                        headers: {
+                            'content-type': 'application/json',
+                            'token':'d4c0bbd9721045abb2d251c6506d7955'
+                        },
+                        body: JSON.stringify({
+                            'productId':104,
+                            'channel':'paypal'
+                        })
+                    }).then(function(res) {
+                        return res.json();
+                    }).then(function(data) {
+                        console.info(data.data.outOrderNo);
+                        return data.data.outOrderNo; // Use the same key name for order ID on the client and server
+                    });
+                },
+                onApprove: function(data) {
+                    debugger;
+                    console.info("订单id："+data.orderID);
+                    return fetch('http://localhost:8080/pay/vip/payOrder', {
+                        method:"post",
+                        headers: {
+                            'content-type': 'application/json',
+                            'token':'d4c0bbd9721045abb2d251c6506d7955'
+                        },
+                        body: JSON.stringify({
+                            'outOrderNo':data.orderID,
+                            'channel':'paypal'
+                        })
+                    }).then(function(res) {
+                        return res.json();
+                    }).then(function(details) {
+                        console.info(details.data)
+                        alert("pay complete,orderId:"+details.data.complete);
                     })
-                }).then(function(res) {
-                    return res.json();
-                }).then(function(data) {
-                    console.info(data.data.outOrderNo);
-                    return data.data.outOrderNo; // Use the same key name for order ID on the client and server
-                });
-            },
-            onApprove: function(data) {
-                debugger;
-                console.info("订单id："+data.orderID);
-                return fetch('http://localhost:8080/pay/vip/payOrder', {
-                    method:"post",
-                    headers: {
-                        'content-type': 'application/json',
-                        'token':'86f9d0859be547ce8d2aea65c94044b1'
-                    },
-                    body: JSON.stringify({
-                        'outOrderNo':data.orderID,
-                        'channel':'paypal'
-                    })
-                }).then(function(res) {
-                    return res.json();
-                }).then(function(details) {
-                    console.info(details.data)
-                    alert("pay complete,orderId:"+details.data.complete);
-                })
+                }
+            })
+
+            // Check if the button is eligible
+            if (button.isEligible()) {
+
+                // Render the standalone button for that funding source
+                button.render('#paypal-button-container');
             }
-        }).render('#paypal-button-container');
+        });
+
+        // paypal.Buttons({
+        //     createOrder: function() {
+        //         return fetch('http://localhost:8080/pay/vip/createOrder', {
+        //             method: 'post',
+        //             headers: {
+        //                 'content-type': 'application/json',
+        //                 'token':'d7b4cf1fc07e482298a58773a02cbeee'
+        //             },
+        //             body: JSON.stringify({
+        //                 'productId':101,
+        //                 'channel':'paypal'
+        //             })
+        //         }).then(function(res) {
+        //             return res.json();
+        //         }).then(function(data) {
+        //             console.info(data.data.outOrderNo);
+        //             return data.data.outOrderNo; // Use the same key name for order ID on the client and server
+        //         });
+        //     },
+        //     onApprove: function(data) {
+        //         debugger;
+        //         console.info("订单id："+data.orderID);
+        //         return fetch('http://localhost:8080/pay/vip/payOrder', {
+        //             method:"post",
+        //             headers: {
+        //                 'content-type': 'application/json',
+        //                 'token':'d7b4cf1fc07e482298a58773a02cbeee'
+        //             },
+        //             body: JSON.stringify({
+        //                 'outOrderNo':data.orderID,
+        //                 'channel':'paypal'
+        //             })
+        //         }).then(function(res) {
+        //             return res.json();
+        //         }).then(function(details) {
+        //             console.info(details.data)
+        //             alert("pay complete,orderId:"+details.data.complete);
+        //         })
+        //     }
+        // }).render('#paypal-button-container');
         // This function displays Smart Payment Buttons on your web page.
     </script>
 </body>
