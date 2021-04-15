@@ -15,7 +15,7 @@
 
     <script>
         var FUNDING_SOURCES = [
-            paypal.FUNDING.PAYPAL
+            paypal.FUNDING.PAYPAL,
             // paypal.FUNDING.VENMO,
             // paypal.FUNDING.CREDIT,
             // paypal.FUNDING.CARD
@@ -31,10 +31,10 @@
                         method: 'post',
                         headers: {
                             'content-type': 'application/json',
-                            'token':'d4c0bbd9721045abb2d251c6506d7955'
+                            'token':'007f1a1191a1427a8b162e791fe383da'
                         },
                         body: JSON.stringify({
-                            'productId':104,
+                            'productId':101,
                             'channel':'paypal'
                         })
                     }).then(function(res) {
@@ -51,7 +51,7 @@
                         method:"post",
                         headers: {
                             'content-type': 'application/json',
-                            'token':'d4c0bbd9721045abb2d251c6506d7955'
+                            'token':'007f1a1191a1427a8b162e791fe383da'
                         },
                         body: JSON.stringify({
                             'outOrderNo':data.orderID,
